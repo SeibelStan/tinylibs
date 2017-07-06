@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		body {
+			font-weight: 300;
+			background: #2c3e50;
+			color: #fff;
+			font-family: Helvetica, sans-serif;
+			line-height: 1.4;
+		}
+
+		#content {
+			text-transform: lowercase;
+			height: 100vh;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			width: 100%;
+			text-align: center;
+		}
+
+		#time {
+			font-size: 24pt;
+		}
+		#date {
+			color: #ecf0f1;
+			font-size: 18pt;
+		}
+		#weekday {
+			color: #ecf0f1;
+			font-size: 18pt;
+		}
+
+		.marked-empathy {
+			background-color: #d35400;
+		}
+		.marked-nature {
+			background-color: #27ae60;
+		}
+		.marked-human {
+			background-color: #2980b9;
+		}
+	</style>
+
+	<script>
+		function mark(type, title) {
+			if(type == 'clear') {
+				document.getElementById('content').setAttribute('class', '');
+			}
+			else {
+				document.getElementById('content').setAttribute('class', 'marked-' + type);
+			}
+
+			if(title) {
+				document.getElementById('weekday').innerHTML += '<br>' + title;
+			}
+		}
+
+		function tick() {
+			var fd = new Date();
+			var sourceHours = (fd.getHours() >= 12) ? fd.getHours() - 12 : fd.getHours();
+			var sourceMinutes = fd.getMinutes();
+			var time = '';
+
+			var monthsArray = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+			var daysArray = [
+				'первое', 'второе', 'третье', 'четвёртое', 'пятое', 'шестое', 'седьмое', 'восьмое', 'девятое',
+				'десятое', 'одиннадцатое', 'двенадцатое', 'тринадцатое', 'четырнадцатое', 'пятнадцатое', 'шестнадцатое', 'семнадцатое', 'восемнадцатое', 'девятнадцатое',
+				'двадцатое', 'двадцать первое', 'двадцать второе', 'двадцать третье', 'двадцать четвёртое', 'двадцать пятое', 'двадцать шестое', 'двадцать седьмое', 'двадцать восьмое', 'двадцать девятое',
+				'тридцатое', 'тридцать первое'
+			];
+			var weakDaysArray = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+			var hoursArray = ['час', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять', 'десять', 'одиннадцать', 'двенадцать'];
+			var hoursAltArray = ['первого', 'второго', 'третьего', 'четвёртого', 'пятого', 'шестого', 'седьмого', 'восьмого', 'девятого', 'десятого', 'одиннадцатого', 'двенадцатого'];
+			var minutesArray = [
+				'ровно',
+				'одна', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять', 'десять',
+				'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'четверть', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать',
+				'двадцать', 'двадцать одна', 'двадцать две', 'двадцать три', 'двадцать четыре', 'двадцать пять', 'двадцать шесть', 'двадцать семь', 'двадцать восемь', 'двадцать девять',
+				'половина', 'тридцать одна', 'тридцать две', 'тридцать три', 'тридцать четыре', 'тридцать пять', 'тридцать шесть', 'тридцать семь', 'тридцать восемь', 'двадцать девять',
+				'без двадцати', 'без девятнадцати', 'без восемнадцати', 'без семнадцати', 'без шестнадцати', 'без четверти', 'без четырнадцати', 'без тринадцати', 'без двенадцати', 'без одиннадцати',
+				'без десяти', 'без девяти', 'без восьми', 'без семи', 'без шести', 'без пяти', 'без четырёх', 'без трёх', 'без двух', 'без одной'
+			];
+
+			var ch = hoursArray[sourceHours];
+			var cha = hoursAltArray[sourceHours];
+			var cm = minutesArray[sourceMinutes];
+
+			if(sourceMinutes == 0) {
+				time = (sourceHours == 0) ? (hoursArray[11] + ' ' + cm) : (hoursArray[sourceHours - 1] + ' ' + cm);
+			}
+			else if(sourceMinutes < 40) {
+				time = cm + ' ' + cha;
+			}
+			else {
+				time = cm + ' ' + ch;
+			}
+
+			document.getElementById('date').innerHTML = daysArray[fd.getDate() - 1] + ' ' + monthsArray[fd.getMonth()];
+			document.getElementById('weekday').innerHTML = weakDaysArray[fd.getDay()];
+			document.getElementById('time').innerHTML = time;
+
+			mark('clear');
+
+			var markedDays = [
+				{m: 1, d: 1, tp: 'human', tt: 'Григор. НГ'},
+				{m: 3, d: 20, tp: 'nature', tt: 'Равноденствие'},
+				{m: 3, d: 22, tp: 'nature', tt: 'Начало весны'},
+				{m: 3, d: 25, tp: 'human', tt: 'День Н.'},
+				{m: 4, d: 24, tp: 'nature', tt: 'Начало лета'},
+				{m: 6, d: 21, tp: 'nature', tt: 'Солнцестояние'},
+				{m: 9, d: 21, tp: 'nature', tt: 'Начало осени'},
+				{m: 9, d: 23, tp: 'nature', tt: 'Равноденствие'},
+				{m: 11, d: 14, tp: 'nature', tt: 'Начало зимы'},
+				{m: 11, d: 24, tp: 'human', tt: 'Мой день'},
+				{m: 12, d: 18, tp: 'human', tt: 'День Ж.'},
+				{m: 12, d: 21, tp: 'nature', tt: 'Солнцестояние, языч. НГ'}
+			];
+
+			for(var i in markedDays) {
+				if(
+					markedDays[i].m == fd.getMonth() + 1 &&
+					markedDays[i].d == fd.getDate()
+				) {
+					mark(markedDays[i].tp, markedDays[i].tt);
+				}
+			}
+
+			setTimeout(tick, 5000);
+		}
+	</script>
+
+	<title>Часики</title>
+</head>
+
+<body>
+<div id="content">
+	<div id="date"></div>
+	<div id="time"></div>
+	<div id="weekday"></div>
+</div>
+<script>tick();</script>
+</body>
+</html>
