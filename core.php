@@ -4,7 +4,11 @@ function view($page) {
     return 'views/' . $page . '.php';
 }
 
-function clear($data, $length) {
+function view($view) {
+    return 'views/' . $view . '.php';
+}
+
+function clear($data, $length = 0) {
     $data = strip_tags($data);
     $data = trim($data);
     if($length) {
@@ -13,28 +17,21 @@ function clear($data, $length) {
     $data = htmlspecialchars($data);
     return $data;
 }
-
-function dbEscape($data) {
-    global $db;
-    return $db->real_escape_string($data);
-}
-
-function textRows($data) {
-    return explode("\n", trim($data));
-}
-
 function request($name) {
     return isset($_REQUEST[$name]) ? $_REQUEST[$name] : '';
 }
-function clearRequest($name, $length) {
+function clearRequest($name, $length = 0) {
     return clear(request($name), $length);
 }
-
 function session($name, $value = null) {
     if(isset($value)) {
         $_SESSION[$name] = $value;
     }
     return isset($_SESSION[$name]) ? $_SESSION[$name] : '';
+}
+
+function textRows($data) {
+    return explode("\n", trim($data));
 }
 
 function redirect($path) {
@@ -72,6 +69,10 @@ function checkAdminZone() {
     return $result;
 }
 
+function dbEscape($data) {
+    global $db;
+    return $db->real_escape_string($data);
+}
 function dbs($sql, $single = false) {
     global $db;
     $result = $db->query($sql);
@@ -239,4 +240,34 @@ function exportToCsv($table, $fields, $filename = 'export.csv') {
     header("Content-Disposition: attachment; filename=$filename");
     fpassthru($f);
     exit;
+}
+
+function xrate($amount, $currIn, $currTo = 'USD') {
+    $hour = date('Y-m-d H');
+    $xrates = dbs("select * from xrates where date like '$hour%'", true);
+    if(!$xrates) {
+        $content = file_get_contents('https://api.coinmarketcap.com/v1/ticker/');
+        dbi("insert into xrates (content) values ('" . dbEscape($content) . "')");
+    }
+    else {
+        $content = $xrates->content;
+    }
+    $content = json_decode($content);
+
+    foreach($content as $unit) {
+        $inUsd = $amount;
+        if($unit->symbol == $currIn) {
+            $inUsd = $amount * $unit->price_usd;
+            if($currTo == 'USD') {
+                return $amount * $inUsd;
+            }
+            break;
+        }
+    }
+    
+    foreach($content as $unit) {
+        if($unit->symbol == $currTo) {
+            return $inUsd / $unit->price_usd;
+        }
+    }
 }
