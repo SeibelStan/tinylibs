@@ -16,8 +16,8 @@ function telegraphUpload($data) {
         if(!file_exists($file)) {
             continue;
         }
-        $ext = mb_strtolower(pathinfo($file)['extension']);
-        $ext = preg_replace('/jpeg/', 'jpg', $ext);
+        $ext = strtolower(pathinfo($file)['extension']);
+        $ext = preg_replace('/jpg/', 'jpeg', $ext);
         $extValid = in_array($ext, ['png', 'jpg', 'gif']);
         $sizeValid = filesize($file) < 5 * 1024 * 1024;
         if(!$extValid || !$sizeValid) {
@@ -25,7 +25,7 @@ function telegraphUpload($data) {
         }
         
         $curlFile = curl_file_create($file);
-        $curlFile->mime = 'image/' . $ext; // если надо видео и другое, сделай if
+        $curlFile->mime = 'image/' . $ext;
         $curlFile->postname = 'blob';
         $postData = [
             'file' => $curlFile
