@@ -5,41 +5,61 @@ ini_set('display_errors', 1);
 
 header('Content-type: text/plain');
 
-function tgMarkParse($data) {
-    $data = json_decode($data);
-    $entities = @$data->message->entities ?: [];
-
-    $text = $data->message->text;
-    $chars = preg_split('//u', $text);
-
+function tgCheckTag($result, $mod, $i, $entities) {
     $tags = [
         'bold' => ['<b>', '</b>'],
         'italic' => ['<i>', '</i>'],
+        'code' => ['<code>', '</code>'],
+        'underline' => ['<u>', '</u>'],
+        'strikethrough' => ['<s>', '</s>'],
         'pre' => ['<pre>', '</pre>'],
         'text_link' => ['<a href="DOOMURL">', '</a>']
     ];
 
-    $result = '';
+    $hit = false;
+    foreach ($entities[$mod] as $ent) {
+        $offset = $ent->offset + 1;
+        if ($mod) { $offset += $ent->length; }
 
-    foreach ($chars as $i => $char) {
-        foreach ($entities as $ent) {
-            if ($i == $ent->offset + 1) {
-                $result .= $tags[$ent->type][0];
-                if ($ent->type == 'text_link') {
-                    $result = preg_replace('/DOOMURL/', $ent->url, $result);
-                }
+        if ($i == $offset) {
+            if ($mod && $ent->type == 'text_link') {
+                $result = preg_replace('/DOOMURL/', $ent->url, $tags[$ent->type][$mod]);
             }
-            if ($i == $ent->offset + $ent->length + 1) {
-                $result .= $tags[$ent->type][1];
+            else {
+                $result .= $tags[$ent->type][$mod];
             }
+            $hit = true;
         }
-        $result .= $char;
     }
 
+    return [$result, $hit];
+};
+
+function tgMarkParse($data) {
+    $entities = [
+        $data->message->entities,
+        array_reverse($data->message->entities)
+    ];
+
+    $text = $data->message->text;
+    $chars = preg_split('//u', $text);
+
+    $result = '';
+
+    $mod = 0;
+    foreach ($chars as $i => $char) {
+        list($result, $hit) = tgCheckTag($result, $mod, $i, $entities);
+        $mod = abs($mod - 1);
+
+        list($result, $hit) = tgCheckTag($result, $mod, $i, $entities);
+        if ($hit) { $mod = abs($mod - 1); }
+
+        $result .= $char;
+    }
     return $result;
 }
 
-$data = '
+$data = json_decode('
 {
   "message": {
     "text": "Привет!\nЭто курсив\nЭто моноширный\nЭто ссылка",
@@ -62,6 +82,6 @@ $data = '
         }
     ]
   }
-}';
+}');
 
 echo tgMarkParse($data);
