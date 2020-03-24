@@ -22,8 +22,8 @@ function tgCheckTag($result, $mod, $i, $entities) {
         if ($mod) { $offset += $ent->length; }
 
         if ($i == $offset) {
-            if ($mod && $ent->type == 'text_link') {
-                $result = preg_replace('/DOOMURL/', $ent->url, $tags[$ent->type][$mod]);
+            if (!$mod && $ent->type == 'text_link') {
+                $result .= preg_replace('/DOOMURL/', $ent->url, $tags[$ent->type][$mod]);
             }
             else {
                 $result .= $tags[$ent->type][$mod];
