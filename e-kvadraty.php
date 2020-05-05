@@ -44,8 +44,12 @@ for ($mi = 0; $mi < $mw; $mi++) {
 
         for ($fi = 0; $fi < $fw; $fi++) {
             for ($fj = 0; $fj < $fh; $fj++) {
-                $sum = (int) @$map[$mj + $fj][$mi + $fi] + (int) @$fig[$fj][$fi];
+
+                $sum = (int) @$map[$mj + $fj][$mi + $fi] + (int) $fig[$fj][$fi];
                 if ($sum > 1)  {
+                    $check = 0;
+                }
+                if (@$map[$mj + $fj][$mi + $fi] == '' && $fig[$fj][$fi] == '1') {
                     $check = 0;
                 }
             }
