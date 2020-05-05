@@ -33,8 +33,8 @@ echo "\n\n";
 
 $end = 1;
 
-for ($mi = 0; $mi <= $mw - 1; $mi++) {
-    for ($mj = 0; $mj <= 1; $mj++) {
+for ($mi = 0; $mi < $mw; $mi++) {
+    for ($mj = 0; $mj < $mh; $mj++) {
 
         if (!$end) {
             continue;
