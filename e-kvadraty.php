@@ -6,18 +6,18 @@ header('Content-type: text/plain');
 
 $map = @$_GET['map'] ?: trim("
     1111
-    1001
-    1010
-    1001
+    1110
+    1110
+    1110
 ");
 
 $map = preg_replace('/\s+/', "\n", $map);
 $map = explode("\n", $map);
 
 $fig = @$_GET['fig'] ?: trim("
-    110
-    101
-    110
+    100
+    100
+    100
 ");
 $fig = preg_replace('/\s+/', "\n", $fig);
 $fig = explode("\n", $fig);
@@ -33,8 +33,8 @@ echo "\n\n";
 
 $end = 1;
 
-for ($mi = 0; $mi <= $mw - $fw; $mi++) {
-    for ($mj = 0; $mj <= $mh - $fh; $mj++) {
+for ($mi = 0; $mi <= $mw - 1; $mi++) {
+    for ($mj = 0; $mj <= 1; $mj++) {
 
         if (!$end) {
             continue;
@@ -44,7 +44,7 @@ for ($mi = 0; $mi <= $mw - $fw; $mi++) {
 
         for ($fi = 0; $fi < $fw; $fi++) {
             for ($fj = 0; $fj < $fh; $fj++) {
-                $sum = (int) $map[$mj + $fj][$mi + $fi] + (int) $fig[$fj][$fi];
+                $sum = (int) @$map[$mj + $fj][$mi + $fi] + (int) @$fig[$fj][$fi];
                 if ($sum > 1)  {
                     $check = 0;
                 }
